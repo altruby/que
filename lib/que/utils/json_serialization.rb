@@ -13,8 +13,15 @@ module Que
       end
 
       def deserialize_json(json)
-        # Allowing `create_additions` would be a security vulnerability.
-        JSON.parse(json, symbolize_names: true, create_additions: false)
+        major = Integer(JSON::VERSION[0])
+        if major <= 2
+          # Allowing `create_additions` would be a security vulnerability.
+          JSON.parse(json, symbolize_names: true, create_additions: false)
+        else
+          # json v3+ has dropped the 'create_additions' option for secrity reasons:
+          # https://github.com/ruby/json/blob/master/CHANGES.md
+          JSON.parse(json, symbolize_names: true)
+        end
       end
     end
   end
